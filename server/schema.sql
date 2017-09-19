@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS `messages`;
 CREATE TABLE `messages` (
   `id` INT AUTO_INCREMENT,
   `username` INT,
-  `message` TEXT,
+  `message` VARCHAR(256),
   `roomname` INT,
   PRIMARY KEY (`id`)
 );
@@ -16,16 +16,18 @@ DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
   `id` INT AUTO_INCREMENT,
-  `name` TEXT,
-  PRIMARY KEY (`id`)
+  `name` VARCHAR(24),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`name`)
 );
 
 DROP TABLE IF EXISTS `rooms`;
 
 CREATE TABLE `rooms` (
   `id` INT AUTO_INCREMENT,
-  `name` TEXT,
-  PRIMARY KEY (`id`)
+  `name` VARCHAR(12),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`name`)
 );
 
 ALTER TABLE `messages` ADD FOREIGN KEY (username) REFERENCES `users` (`id`);
