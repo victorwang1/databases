@@ -2,17 +2,29 @@ var db = require('../db');
 
 module.exports = {
   messages: {
-    get: function () {}, // a function which produces all the messages
-    post: function (req, res) {
-      db.writeToDB(req.body);
-    } // a function which can be used to insert a message into the database
+    get: function (req, res, callback) {
+      db.messages.readFromDB(callback);
+    },
+    post: function (req, res, callback) {
+      db.messages.writeToDB(req.body, callback);
+    }
   },
 
   users: {
-    // Ditto as above.
-    get: function () {},
-    post: function (req, res) {
-      db.writeToDB(req.body);
+    get: function () {
+
+    },
+    post: function (req, res, callback) {
+      db.users.writeToDB(req.body, callback);
+    }
+  },
+
+  rooms: {
+    get: function () {
+
+    },
+    post: function (req, res, callback) {
+      db.rooms.writeToDB(req.body, callback);
     }
   }
 };

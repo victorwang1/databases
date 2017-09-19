@@ -5,7 +5,7 @@ USE chat;
 DROP TABLE IF EXISTS `messages`;
 
 CREATE TABLE `messages` (
-  `id` INTEGER AUTO_INCREMENT,
+  `id` INT AUTO_INCREMENT,
   `username` INT,
   `message` TEXT,
   `roomname` INT,
@@ -15,7 +15,7 @@ CREATE TABLE `messages` (
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
-  `id` INTEGER AUTO_INCREMENT,
+  `id` INT AUTO_INCREMENT,
   `name` TEXT,
   PRIMARY KEY (`id`)
 );
@@ -23,7 +23,7 @@ CREATE TABLE `users` (
 DROP TABLE IF EXISTS `rooms`;
 
 CREATE TABLE `rooms` (
-  `id` INTEGER AUTO_INCREMENT,
+  `id` INT AUTO_INCREMENT,
   `name` TEXT,
   PRIMARY KEY (`id`)
 );

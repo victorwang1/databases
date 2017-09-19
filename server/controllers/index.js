@@ -3,26 +3,40 @@ var models = require('../models');
 module.exports = {
   messages: {
     get: function (req, res) {
-
-    }, // a function which handles a get request for all messages
+      models.messages.get(req, res, (err, data) => {
+        res.statusCode = 200;
+        res.end(data);
+      });
+    },
     post: function (req, res) {
-      // console.log(req.body);
-      models.messages.post(req, res);
-      res.statusCode = 201;
-      res.end();
-    } // a function which handles posting a message to the database
+      models.messages.post(req, res, (err, data) => {
+        res.statusCode = 201;
+        res.end();
+      });
+    }
   },
 
   users: {
-    // Ditto as above
     get: function (req, res) {
 
     },
     post: function (req, res) {
-      // console.log(req.body);
-      // models.users.post(req, res);
-      res.statusCode = 201;
-      res.end();
+      models.users.post(req, res, (err, data) => {
+        res.statusCode = 201;
+        res.end();
+      });
+    }
+  },
+
+  rooms: {
+    get: function (req, res) {
+
+    },
+    post: function (req, res) {
+      models.rooms.post(req, res, (err, data) => {
+        res.statusCode = 201;
+        res.end();
+      });
     }
   }
 };

@@ -5,52 +5,81 @@ var mysql = require('mysql');
 // and to the database "chat".
 
 module.exports = {
-  writeToDB: function({username, message, roomname}) {
-    var connection = mysql.createConnection({
-      host     : 'localhost',
-      user     : 'root',
-      password : 'plantlife',
-      database : 'chat'
-    });
+  utils: {
+    setupConnection: function() {
+      var connection = mysql.createConnection({
+        host     : 'localhost',
+        user     : 'root',
+        password : '',
+        database : 'chat'
+      });
 
-    connection.connect();
+      connection.connect();
 
-    connection.query(`INSERT INTO users (name) VALUES (${mysql.escape(username)})`,
-      (error, results, fields) => {
-        if (error) throw error;
+      return connection;
+    }
+  },
 
-        var userId = results.insertId;
-        connection.query(`INSERT INTO rooms (name) VALUES (${mysql.escape(roomname)})`,
-          (error, results, fields) => {
-            if (error) throw error;
-            console.log('>>>>>>>>USER_ID', userId);
+  messages: {
+    writeToDB: function({username, message, roomname}, callback) {
+      var connection = module.exports.utils.setupConnection();
+      var writeToUsers = module.exports.users.writeToDB;
+      var writeToRooms = module.exports.rooms.writeToDB;
+      writeToUsers({username: username}, () => { 
+        writeToRooms({roomname: roomname}, () => {
+          connection.query(`INSERT INTO messages (username, message, roomname) 
+                            SELECT users.id, ${mysql.escape(message)}, rooms.id 
+                            FROM users, rooms 
+                            WHERE users.name = ${mysql.escape(username)} AND rooms.name = ${mysql.escape(roomname)}`,
+            (error, results, fields) => {
+              if (error) throw error;
+              connection.end();
+              console.log('>>>>>>>>>>>>REACHED');
+              callback(null, null);
+            }
+          );
+        });
+      });
+    },
 
-            var roomId = results.insertId;
-            connection.query(`INSERT INTO messages (username, message, roomname)
-                              SELECT users.id, ${mysql.escape(message)}, rooms.id FROM users, rooms WHERE users.id=${mysql.escape(userId)} AND rooms.id=${mysql.escape(roomId)}
-                              `,
-                              //
-                              // SET username = (SELECT id
-                              //                 FROM users
-                              //                 WHERE id = ${mysql.escape(userId)})
-                              //     message = ${mysql.escape(message)}
-                              //     roomname = (SELECT id
-                              //                 FROM rooms
-                              //                 WHERE id = ${mysql.escape(roomId)})
+    readFromDB: function(callback) {
+      var connection = module.exports.utils.setupConnection();
+      connection.query(`SELECT users.name AS 'username', messages.message, rooms.name AS 'roomname' FROM users, messages, rooms WHERE users.id = messages.username AND rooms.id = messages.roomname`,
+        (error, results, fields) => {
+          if (error) throw error;
+          connection.end();
+          console.log('>>>>>>>>>', {results: results});
+          callback(null, JSON.stringify({results: results}));
+        }
+      );
+    }
+  },
 
-              (error, results, fields) => {
-                // console.log(message);
-                console.log('>>>>>>>USER_ID_ROOM_ID', userId, roomId);
-                console.log(results);
-                if (error) throw error;
+  users: {
+    writeToDB: function({username}, callback) {
+      var connection = module.exports.utils.setupConnection();
+      connection.query(`INSERT INTO users (name) VALUES (${mysql.escape(username)})`,
+        (error, results, fields) => {
+          if (error) throw error;
+          connection.end();
+          console.log('>>>>>>>>>>>>USERS');
+          callback(null, null);
+        }
+      );
+    }
+  },
 
-                connection.end();
-
-              }
-            );
-          }
-        );
-      }
-    );
+  rooms: {
+    writeToDB: function({roomname}, callback) {
+      var connection = module.exports.utils.setupConnection();
+      connection.query(`INSERT INTO rooms (name) VALUES (${mysql.escape(roomname)})`,
+        (error, results, fields) => {
+          if (error) throw error;
+          connection.end();
+          console.log('>>>>>>>>>>>>ROOMS');
+          callback(null, null);
+        }
+      );
+    }
   }
 }
